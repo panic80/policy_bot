@@ -1,12 +1,11 @@
 {
   "dependencies": {
-    "next": "^15.0.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "openai": "^4.72.0",
-    "framer-motion": "^11.11.17",
     "axios": "^1.7.7",
-    "rate-limiter-flexible": "^5.0.4"
+    "framer-motion": "^11.11.17",
+    "next": "^15.0.3",
+    "rate-limiter-flexible": "^5.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "scripts": {
     "dev": "next dev",
@@ -27,4 +26,3 @@
     "typescript": "^5.6.3"
   }
 }
-
