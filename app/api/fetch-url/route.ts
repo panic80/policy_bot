@@ -1,15 +1,9 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 const CFTDTI_URL = "https://www.canada.ca/en/department-national-defence/services/benefits-military/pay-pension-benefits/benefits/canadian-forces-temporary-duty-travel-instructions.html";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Method not allowed' });
-  }
-
+export async function GET(request: NextRequest) {
   try {
     const response = await fetch(CFTDTI_URL);
     const text = await response.text();
@@ -19,15 +13,16 @@ export default async function handler(
                          .replace(/\s+/g, ' ')
                          .trim();
 
-    return res.status(200).json({
+    return NextResponse.json({
       characterCount: cleanText.length,
       wordCount: cleanText.split(/\s+/).length
     });
   } catch (error: any) {
     console.error('Error fetching URL:', error);
-    return res.status(500).json({
-      message: error.message || 'Failed to fetch URL content'
-    });
+    return NextResponse.json(
+      { error: error.message || 'Failed to fetch URL content' },
+      { status: 500 }
+    );
   }
 }
 
