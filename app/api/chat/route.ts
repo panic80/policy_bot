@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import openrouterClient from '../../../utils/openrouterClient';
-import axios, { AxiosError } from 'axios'; // Add this import
+import axios, { AxiosError } from 'axios';
 
 const CFTDTI_URL = "https://www.canada.ca/en/department-national-defence/services/benefits-military/pay-pension-benefits/benefits/canadian-forces-temporary-duty-travel-instructions.html";
 
@@ -93,11 +93,6 @@ export async function POST(request: NextRequest) {
       const statusCode = axiosError.response?.status || 500;
       const errorData = axiosError.response?.data;
       
-      console.error('OpenRouter API Error Details:', {
-        status: statusCode,
-        data: errorData
-      });
-
       return NextResponse.json(
         { error: errorData?.error || 'OpenRouter API error' },
         { status: statusCode }
