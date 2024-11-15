@@ -12,8 +12,8 @@ async function fetchCFTDTIContent() {
     }
     const text = await response.text();
     return text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-  } catch {
-    console.error('Error fetching CFTDTI content');
+  } catch (error) {
+    console.error('Error fetching CFTDTI content:', error);
     throw new Error('Failed to fetch CFTDTI content');
   }
 }
@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
   try {
     // Validate API key
     if (!process.env.OPENROUTER_API_KEY) {
+      console.error('OpenRouter API key not configured');
       return NextResponse.json({ error: 'OpenRouter API key is not configured' }, { status: 500 });
     }
 
@@ -29,17 +30,22 @@ export async function POST(request: NextRequest) {
     let body;
     try {
       body = await request.json();
-    } catch {
+    } catch (error) {
+      console.error('Error parsing request body:', error);
       return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
     }
 
     const { userInput } = body;
     if (!userInput) {
+      console.error('Missing user input');
       return NextResponse.json({ error: 'Missing user input' }, { status: 400 });
     }
 
+    console.log('Processing request for input:', userInput); // Debug log
+
     // Fetch source content
     const sourceContent = await fetchCFTDTIContent();
+    console.log('Fetched source content length:', sourceContent.length); // Debug log
 
     const systemPrompt = `You are a helpful assistant specializing in Canadian Forces Temporary Duty Travel Instructions (CFTDTI). 
     Use the following source content to answer questions accurately. Only provide information that is directly supported by the source content.
@@ -49,6 +55,7 @@ export async function POST(request: NextRequest) {
     ${sourceContent}`;
 
     // Make request to OpenRouter
+    console.log('Making request to OpenRouter...'); // Debug log
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
@@ -70,20 +77,30 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    // Validate response
+    console.log('OpenRouter response status:', response.status); // Debug log
+
     if (!response.data?.choices?.[0]?.message?.content) {
+      console.error('Invalid OpenRouter response:', response.data); // Debug log
       throw new Error('Invalid response from OpenRouter');
     }
 
-    return NextResponse.json({
+    const result = {
       message: response.data.choices[0].message.content,
       characterCount: sourceContent.length
-    });
+    };
+
+    console.log('Sending successful response'); // Debug log
+    return NextResponse.json(result);
 
   } catch (error) {
     console.error('Error in API route:', error);
 
     if (axios.isAxiosError(error)) {
+      console.error('Axios error details:', {
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
       const statusCode = error.response?.status || 500;
       const errorMessage = error.response?.data?.error || error.message;
       return NextResponse.json({ error: errorMessage }, { status: statusCode });

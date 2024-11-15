@@ -19,6 +19,8 @@ export default function Home() {
     setCharacterCount(0);
 
     try {
+      console.log('Sending request with input:', userInput); // Debug log
+
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -27,10 +29,22 @@ export default function Home() {
         body: JSON.stringify({ userInput }),
       });
 
-      const data = await res.json();
+      console.log('Response status:', res.status); // Debug log
+
+      // Try to get the raw text first
+      const rawText = await res.text();
+      console.log('Raw response:', rawText); // Debug log
+
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch (parseError) {
+        console.error('JSON Parse Error:', parseError); // Debug log
+        throw new Error(`Failed to parse JSON response: ${rawText}`);
+      }
 
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to get response');
+        throw new Error(data.error || `Server error: ${res.status}`);
       }
 
       if (data.error) {
@@ -40,13 +54,14 @@ export default function Home() {
       setResponse(data.message);
       setCharacterCount(data.characterCount || 0);
     } catch (err) {
-      console.error('Error:', err);
+      console.error('Error details:', err); // Debug log
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Rest of your component remains the same
   return (
     <main className={styles.main}>
       <div className={styles.container}>
