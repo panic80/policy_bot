@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect } from 'react';
 import styles from '../styles/Home.module.css';
 
@@ -24,8 +26,8 @@ export default function Home() {
         const res = await fetch('/api/fetch-url');
         const data = await res.json();
         setUrlStats(data);
-      } catch (err) {
-        console.error('Failed to fetch URL stats:', err);
+      } catch (error) {
+        console.error('Failed to fetch URL stats:', error);
       } finally {
         setIsSourceLoading(false);
       }
@@ -55,14 +57,14 @@ export default function Home() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || 'Server error');
+        throw new Error(data.error || 'Server error');
       }
 
       setResponse(data.message);
       setCharacterCount(data.characterCount || 0);
-    } catch (err: Error | unknown) {
-      console.error('Error:', err);
-      setError(err.message || 'Something went wrong');
+    } catch (error) {
+      console.error('Error:', error);
+      setError(error instanceof Error ? error.message : 'Something went wrong');
     } finally {
       setIsLoading(false);
     }
@@ -146,6 +148,10 @@ export default function Home() {
           </div>
         )}
       </main>
+
+      <footer className={styles.footer}>
+        <p>Powered by OpenRouter API</p>
+      </footer>
     </div>
   );
 }
