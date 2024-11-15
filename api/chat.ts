@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import openrouterClient from '../../utils/openrouterClient';
+import openrouterClient from '@/utils/openrouterClient';
+
 
 type ChatMessage = {
   role: 'system' | 'user' | 'assistant';
