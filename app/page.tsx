@@ -28,7 +28,11 @@ export default function Home() {
         const data = await res.json();
         setUrlStats(data);
       } catch (err) {
-        console.error('Failed to fetch URL stats:', err);
+        if (err instanceof Error) {
+          console.error('Failed to fetch URL stats:', err.message);
+        } else {
+          console.error('Failed to fetch URL stats:', err);
+        }
       } finally {
         setIsSourceLoading(false);
       }
@@ -63,9 +67,14 @@ export default function Home() {
 
       setResponse(data.message);
       setCharacterCount(data.characterCount || 0);
-    } catch (err: Error | unknown) {
-      console.error('Error:', err);
-      setError(err.message || 'Something went wrong');
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error('Error:', err.message);
+        setError(err.message);
+      } else {
+        console.error('Error:', err);
+        setError('Something went wrong');
+      }
     } finally {
       setIsLoading(false);
     }
