@@ -60,7 +60,7 @@ export default function Home() {
 
       setResponse(data.message);
       setCharacterCount(data.characterCount || 0);
-    } catch (err: any) {
+    } catch (err: Error | unknown) {
       console.error('Error:', err);
       setError(err.message || 'Something went wrong');
     } finally {

@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
       characterCount: sourceContent.length
     });
 
-  } catch (error: any) {
+  } catch (error: Error | unknown) {
     console.error('Error in API route:', error);
     
     if (error.response) {
