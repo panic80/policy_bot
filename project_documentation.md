@@ -1,3 +1,117 @@
+# CFTDTI Chat Assistant Project Documentation
+Generated on: 2024-11-15 13:36:16
+
+## Project Overview
+- Project Type: Next.js ChatGPT-like interface for CFTDTI
+- Model: google/gemini-flash-1.5-8b via OpenRouter.ai
+- Source URL: https://www.canada.ca/en/department-national-defence/services/benefits-military/pay-pension-benefits/benefits/canadian-forces-temporary-duty-travel-instructions.html
+
+## Project Structure and File Contents
+
+### File: tailwind.config.js
+```js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+
+```
+
+### File: next.config.js
+```js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+}
+
+module.exports = nextConfig
+
+
+```
+
+### File: next-env.d.ts
+```ts
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/pages/building-your-application/configuring/typescript for more information.
+
+```
+
+### File: README.md
+```md
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+```
+
+### File: tailwind.config.ts
+```ts
+import type { Config } from "tailwindcss";
+
+export default {
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        background: "var(--background)",
+        foreground: "var(--foreground)",
+      },
+    },
+  },
+  plugins: [],
+} satisfies Config;
+
+```
+
+### File: package-lock.json
+```json
 {
   "name": "policy-bot",
   "version": "0.1.0",
@@ -6224,3 +6338,851 @@
     }
   }
 }
+
+```
+
+### File: package.json
+```json
+{
+  "name": "policy-bot",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "framer-motion": "^11.11.17",
+    "next": "^15.0.3",
+    "openai": "^4.72.0",
+    "rate-limiter-flexible": "^5.0.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.6",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8",
+    "eslint-config-next": "15.0.3",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "typescript": "^5.6.3"
+  }
+}
+
+```
+
+### File: tsconfig.json
+```json
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
+
+```
+
+### File: openaiClient.ts
+```ts
+// utils/openaiClient.ts
+
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  baseURL: "https://openrouter.ai/api/v1",
+  apiKey: process.env.OPENROUTER_API_KEY,
+  defaultHeaders: {
+    "HTTP-Referer": process.env.YOUR_SITE_URL || "",
+    "X-Title": process.env.YOUR_APP_NAME || "",
+  },
+});
+
+export default openai;
+
+```
+
+### File: postcss.config.js
+```js
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+
+```
+
+### File: .eslintrc.json
+```json
+{
+  "extends": ["next/core-web-vitals", "next/typescript"]
+}
+
+```
+
+### File: next.config.ts
+```ts
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  /* config options here */
+};
+
+export default nextConfig;
+
+```
+
+### File: utils/textProcessing.ts
+```ts
+export function preprocessContent(content: string, maxLength: number = 15000) {
+  // Remove extra whitespace
+  let processed = content.replace(/\s+/g, ' ').trim();
+  
+  // Remove common HTML artifacts if any remain
+  processed = processed.replace(/&nbsp;/g, ' ')
+                      .replace(/&amp;/g, '&')
+                      .replace(/&lt;/g, '<')
+                      .replace(/&gt;/g, '>');
+
+  // If content is too long, take beginning and end portions
+  if (processed.length > maxLength) {
+    const halfLength = Math.floor(maxLength / 2);
+    processed = processed.slice(0, halfLength) + 
+                " ... [content truncated for length] ... " + 
+                processed.slice(-halfLength);
+  }
+
+  return processed;
+}
+
+
+```
+
+### File: utils/prompts.ts
+```ts
+export const generateSystemPrompt = (sourceContent: string) => `
+You are an expert assistant specialized in Canadian Forces Temporary Duty Travel Instructions (CFTDTI).
+Your responses must be:
+1. Based ONLY on the provided source content
+2. Accurate and specific to CFTDTI
+3. Include references to relevant sections when possible
+
+When answering:
+- If the information isn't in the source content, clearly state that
+- Quote relevant passages when appropriate
+- Organize complex answers with bullet points or numbering
+- Keep responses clear and concise
+
+Source Content:
+${sourceContent}
+
+Remember: Only provide information that is directly supported by the source content.
+`;
+
+
+```
+
+### File: utils/openaiClient.ts
+```ts
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENROUTER_API_KEY || '',
+  baseURL: 'https://openrouter.ai/api/v1',
+  defaultHeaders: {
+    'HTTP-Referer': 'http://localhost:3000',
+    'X-Title': 'Chat Application',
+  },
+});
+
+export default openai;
+
+
+```
+
+### File: styles/globals.css
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+```
+
+### File: styles/Home.module.css
+```css
+.urlStats {
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #ddd;
+  font-size: 0.875rem;
+}
+.loading {
+  padding: 0.5rem;
+  color: #666;
+  font-style: italic;
+  text-align: center;
+}
+
+.urlStats p {
+  margin: 0 0 0.5rem 0;
+  font-weight: 500;
+}
+
+.urlStats ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.urlStats li {
+  margin: 0.25rem 0;
+  color: #666;
+}
+
+.urlDisplay {
+  background-color: #f0f0f0;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+}
+
+.urlDisplay a {
+  color: #0070f3;
+  text-decoration: none;
+  margin-left: 0.5rem;
+  word-break: break-all;
+}
+
+.urlDisplay a:hover {
+  text-decoration: underline;
+}
+
+.loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.loadingSpinner {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  color: #666;
+}
+
+.loading {
+  padding: 0.5rem;
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+/* Update existing styles */
+.textarea:disabled,
+.button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background-color: #f5f5f5;
+}
+
+.stats {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.stats p {
+  margin: 0.25rem 0;
+}
+
+
+```
+
+### File: components/Footer.tsx
+```tsx
+// components/Footer.tsx
+
+import React from 'react';
+
+const Footer: React.FC = () => {
+  return (
+    <footer className="bg-gray-800 p-4 text-center text-white">
+      © {new Date().getFullYear()} PolicyQA. All rights reserved.
+    </footer>
+  );
+};
+
+export default Footer;
+
+```
+
+### File: components/Layout.tsx
+```tsx
+// components/Layout.tsx
+
+import React from 'react';
+import Header from './Header';
+import Footer from './Footer';
+
+const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <>
+      <Header />
+      <main>{children}</main>
+      <Footer />
+    </>
+  );
+};
+
+export default Layout;
+
+```
+
+### File: components/ResponseDisplay.tsx
+```tsx
+// components/ResponseDisplay.tsx
+
+import React from 'react';
+import { motion } from 'framer-motion';
+
+interface ResponseDisplayProps {
+  response: string;
+}
+
+const ResponseDisplay: React.FC<ResponseDisplayProps> = ({ response }) => {
+  return (
+    <motion.div
+      className="mt-6 p-4 bg-gray-100 rounded-md"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+    >
+      <h2 className="text-xl font-semibold mb-2">Answer:</h2>
+      <p className="text-gray-800">{response}</p>
+    </motion.div>
+  );
+};
+
+export default ResponseDisplay;
+
+```
+
+### File: components/Header.tsx
+```tsx
+// components/Header.tsx
+
+import React from 'react';
+
+const Header: React.FC = () => {
+  return (
+    <header className="bg-gray-800 p-4 flex items-center justify-center">
+      <h1 className="text-white text-xl">PolicyQA</h1>
+    </header>
+  );
+};
+
+export default Header;
+
+```
+
+### File: components/QuestionForm.tsx
+```tsx
+// components/QuestionForm.tsx
+
+import React from 'react';
+
+interface QuestionFormProps {
+  userInput: string;
+  setUserInput: (value: string) => void;
+  sourceUrl: string;
+  setSourceUrl: (value: string) => void;
+  handleSubmit: (e: React.FormEvent) => void;
+  loading: boolean;
+}
+
+const QuestionForm: React.FC<QuestionFormProps> = ({
+  userInput,
+  setUserInput,
+  sourceUrl,
+  setSourceUrl,
+  handleSubmit,
+  loading,
+}) => {
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-gray-700">Your Question:</label>
+        <input
+          type="text"
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
+          required
+          className="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+          placeholder="Enter your policy question"
+        />
+      </div>
+      <div>
+        <label className="block text-gray-700">Source URL:</label>
+        <input
+          type="url"
+          value={sourceUrl}
+          onChange={(e) => setSourceUrl(e.target.value)}
+          required
+          className="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+          placeholder="https://example.com/policy-document"
+        />
+      </div>
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition-colors"
+      >
+        {loading ? 'Loading...' : 'Ask'}
+      </button>
+    </form>
+  );
+};
+
+export default QuestionForm;
+
+```
+
+### File: api/chat.ts
+```ts
+// pages/api/chat.ts
+
+import type { NextApiRequest, NextApiResponse } from 'next';
+import openai from '../../utils/openaiClient';
+
+type Data = {
+  message: any;
+};
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Data>
+) {
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', ['POST']);
+    res.status(405).json({ message: 'Method Not Allowed' });
+    return;
+  }
+
+  const { userInput, sourceUrl } = req.body;
+
+  if (!userInput || !sourceUrl) {
+    res.status(400).json({ message: 'Missing userInput or sourceUrl' });
+    return;
+  }
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "google/gemini-flash-1.5-8b",
+      messages: [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": userInput
+            },
+            {
+              "type": "url",
+              "url": {
+                "url": sourceUrl
+              }
+            }
+          ]
+        }
+      ]
+    });
+
+    res.status(200).json({ message: completion.choices[0].message });
+  } catch (error: any) {
+    console.error('Error in /api/chat:', error);
+
+    // Provide more detailed error messages based on the error type
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      console.error('Response data:', error.response.data);
+      res.status(error.response.status).json({ message: error.response.data });
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error('No response received:', error.request);
+      res.status(500).json({ message: 'No response from OpenRouter.ai API.' });
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.error('Error setting up request:', error.message);
+      res.status(500).json({ message: 'Error setting up the request.' });
+    }
+  }
+}
+
+```
+
+### File: pages/index.tsx
+```tsx
+import { useState, useEffect } from 'react';
+import styles from '../styles/Home.module.css';
+
+const CFTDTI_URL = "https://www.canada.ca/en/department-national-defence/services/benefits-military/pay-pension-benefits/benefits/canadian-forces-temporary-duty-travel-instructions.html";
+
+type UrlStats = {
+  characterCount: number;
+  wordCount: number;
+};
+
+export default function Home() {
+  const [userInput, setUserInput] = useState('');
+  const [response, setResponse] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [characterCount, setCharacterCount] = useState(0);
+  const [urlStats, setUrlStats] = useState<UrlStats | null>(null);
+  const [isSourceLoading, setIsSourceLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUrlStats = async () => {
+      setIsSourceLoading(true);
+      try {
+        const res = await fetch('/api/fetch-url');
+        const data = await res.json();
+        setUrlStats(data);
+      } catch (err) {
+        console.error('Failed to fetch URL stats:', err);
+      } finally {
+        setIsSourceLoading(false);
+      }
+    };
+
+    fetchUrlStats();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    setResponse('');
+    setCharacterCount(0);
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userInput,
+        }),
+      });
+      
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Server error');
+      }
+
+      setResponse(data.message);
+      setCharacterCount(data.characterCount || 0);
+    } catch (err: any) {
+      console.error('Error:', err);
+      setError(err.message || 'Something went wrong');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className={styles.container}>
+      <main className={styles.main}>
+        <h1 className={styles.title}>CFTDTI Assistant</h1>
+        
+        <div className={styles.urlDisplay}>
+          <strong>Reference Document:</strong>
+          <a href={CFTDTI_URL} target="_blank" rel="noopener noreferrer">
+            CFTDTI
+          </a>
+          {isSourceLoading ? (
+            <div className={styles.loading}>Loading source content...</div>
+          ) : urlStats && (
+            <div className={styles.urlStats}>
+              <p>Source Document Statistics:</p>
+              <ul>
+                <li>Characters: {urlStats.characterCount.toLocaleString()}</li>
+                <li>Words: {urlStats.wordCount.toLocaleString()}</li>
+              </ul>
+            </div>
+          )}
+        </div>
+
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div>
+            <label htmlFor="userInput">Your Question:</label>
+            <textarea
+              id="userInput"
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              required
+              className={styles.textarea}
+              placeholder="Ask a question about CFTDTI..."
+              disabled={isLoading || isSourceLoading}
+            />
+            <div className={styles.characterCount}>
+              Characters: {userInput.length}
+            </div>
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={isLoading || isSourceLoading}
+            className={styles.button}
+          >
+            {isLoading ? 'Processing...' : isSourceLoading ? 'Loading Source...' : 'Send Question'}
+          </button>
+        </form>
+
+        {error && (
+          <div className={styles.error}>
+            <p>Error: {error}</p>
+          </div>
+        )}
+
+        {response && (
+          <div className={styles.response}>
+            <h2>Response:</h2>
+            <p>{response}</p>
+            {characterCount > 0 && (
+              <div className={styles.stats}>
+                <p>Source characters processed: {characterCount.toLocaleString()}</p>
+                {urlStats && (
+                  <p>Source coverage: {((characterCount / urlStats.characterCount) * 100).toFixed(1)}%</p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {isLoading && (
+          <div className={styles.loadingOverlay}>
+            <div className={styles.loadingSpinner}>
+              Processing your question...
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+
+
+```
+
+### File: pages/api/fetch-url.ts
+```ts
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+const CFTDTI_URL = "https://www.canada.ca/en/department-national-defence/services/benefits-military/pay-pension-benefits/benefits/canadian-forces-temporary-duty-travel-instructions.html";
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ message: 'Method not allowed' });
+  }
+
+  try {
+    const response = await fetch(CFTDTI_URL);
+    const text = await response.text();
+    
+    // Remove HTML tags and get clean text
+    const cleanText = text.replace(/<[^>]*>/g, ' ')
+                         .replace(/\s+/g, ' ')
+                         .trim();
+
+    return res.status(200).json({
+      characterCount: cleanText.length,
+      wordCount: cleanText.split(/\s+/).length
+    });
+  } catch (error: any) {
+    console.error('Error fetching URL:', error);
+    return res.status(500).json({
+      message: error.message || 'Failed to fetch URL content'
+    });
+  }
+}
+
+
+```
+
+### File: pages/api/chat.ts
+```ts
+import type { NextApiRequest, NextApiResponse } from 'next';
+import openai from '../../utils/openaiClient';
+
+type Data = {
+  message: string;
+  characterCount?: number;
+  error?: string;
+};
+
+const CFTDTI_URL = "https://www.canada.ca/en/department-national-defence/services/benefits-military/pay-pension-benefits/benefits/canadian-forces-temporary-duty-travel-instructions.html";
+
+async function fetchCFTDTIContent() {
+  try {
+    const response = await fetch(CFTDTI_URL);
+    const text = await response.text();
+    // Clean the HTML and get plain text
+    const cleanText = text.replace(/<[^>]*>/g, ' ')
+                         .replace(/\s+/g, ' ')
+                         .trim();
+    return cleanText;
+  } catch (error) {
+    console.error('Error fetching CFTDTI content:', error);
+    throw error;
+  }
+}
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Data>
+) {
+  res.setHeader('Content-Type', 'application/json');
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Only POST method is allowed' });
+  }
+
+  if (!process.env.OPENROUTER_API_KEY) {
+    console.error('OpenRouter API key is not configured');
+    return res.status(500).json({ message: 'OpenRouter API key is not configured' });
+  }
+
+  try {
+    const { userInput } = req.body;
+
+    if (!userInput) {
+      return res.status(400).json({ message: 'Missing user input' });
+    }
+
+    // Fetch CFTDTI content
+    const sourceContent = await fetchCFTDTIContent();
+
+    // Create a more focused system prompt
+    const systemPrompt = `You are a helpful assistant specializing in Canadian Forces Temporary Duty Travel Instructions (CFTDTI). 
+    Use the following source content to answer questions accurately. Only provide information that is directly supported by the source content.
+    If information isn't found in the source, clearly state that. Always reference specific sections when possible.
+
+    Source Content:
+    ${sourceContent}`;
+
+    console.log('Sending request to OpenRouter:', { 
+      userInput,
+      contentLength: sourceContent.length 
+    });
+
+    const completion = await openai.chat.completions.create({
+      model: "google/gemini-flash-1.5-8b",
+      messages: [
+        { 
+          role: "system", 
+          content: systemPrompt
+        },
+        { 
+          role: "user", 
+          content: userInput
+        }
+      ],
+      temperature: 0.3, // Lower temperature for more focused answers
+      max_tokens: 1024,
+      headers: {
+        'HTTP-Referer': 'http://localhost:3000',
+        'X-Title': 'CFTDTI Chat Assistant',
+      }
+    });
+
+    console.log('OpenRouter response:', completion);
+
+    if (!completion.choices[0]?.message?.content) {
+      throw new Error('No response content received');
+    }
+
+    return res.status(200).json({
+      message: completion.choices[0].message.content,
+      characterCount: sourceContent.length
+    });
+
+  } catch (error: any) {
+    console.error('Error in API route:', error);
+    
+    if (error.response) {
+      const statusCode = error.response.status;
+      const errorData = error.response.data;
+      
+      console.error('OpenRouter API Error Details:', {
+        status: statusCode,
+        data: errorData
+      });
+
+      return res.status(statusCode).json({ 
+        message: errorData.error || 'OpenRouter API error' 
+      });
+    }
+    
+    return res.status(500).json({
+      message: error.message || 'Internal server error'
+    });
+  }
+}
+
+
+```
+
+## Setup Instructions
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Create .env.local with required environment variables
+4. Run the development server: `npm run dev`
+
+## To Resume Development
+When starting a new chat, say:
+"I'm continuing development of my CFTDTI Assistant project. Here's my full project documentation: [paste relevant sections]. I'd like to [describe next feature]."
