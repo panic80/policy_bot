@@ -1,6 +1,17 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import openrouterClient from '../../../utils/openrouterClient';
+import axios, { AxiosError } from 'axios'; // Add this import
+
+const CFTDTI_URL = "https://www.canada.ca/en/department-national-defence/services/benefits-military/pay-pension-benefits/benefits/canadian-forces-temporary-duty-travel-instructions.html";
+
+interface OpenRouterResponse {
+  choices: {
+    message: {
+      content: string;
+    };
+  }[];
+}
 
 async function fetchCFTDTIContent() {
   try {
@@ -44,7 +55,7 @@ export async function POST(request: NextRequest) {
     Source Content:
     ${sourceContent}`;
 
-    const response = await openrouterClient.post('/chat/completions', {
+    const response = await openrouterClient.post<OpenRouterResponse>('/chat/completions', {
       model: "google/gemini-flash-1.5-8b",
       messages: [
         { 
@@ -74,12 +85,13 @@ export async function POST(request: NextRequest) {
       characterCount: sourceContent.length
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error in API route:', error);
     
-    if (error.response) {
-      const statusCode = error.response.status;
-      const errorData = error.response.data;
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<{ error: string }>;
+      const statusCode = axiosError.response?.status || 500;
+      const errorData = axiosError.response?.data;
       
       console.error('OpenRouter API Error Details:', {
         status: statusCode,
@@ -87,13 +99,13 @@ export async function POST(request: NextRequest) {
       });
 
       return NextResponse.json(
-        { error: errorData.error || 'OpenRouter API error' },
+        { error: errorData?.error || 'OpenRouter API error' },
         { status: statusCode }
       );
     }
     
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
+      { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }
