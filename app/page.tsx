@@ -1,8 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import styles from './page.module.css';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react'; // Remove useRef if not using it
 
 type UrlStats = {
   characterCount: number;
