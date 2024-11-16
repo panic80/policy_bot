@@ -1,5 +1,5 @@
 # CFTDTI Chat Assistant Project Documentation
-Generated on: 2024-11-15 16:10:25
+Generated on: 2024-11-15 19:48:43
 
 ## Project Overview
 - Project Type: Next.js ChatGPT-like interface for CFTDTI
@@ -7,6 +7,50 @@ Generated on: 2024-11-15 16:10:25
 - Source URL: https://www.canada.ca/en/department-national-defence/services/benefits-military/pay-pension-benefits/benefits/canadian-forces-temporary-duty-travel-instructions.html
 
 ## Project Structure and File Contents
+
+### File: middleware.ts
+```ts
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  // Get the pathname of the request (e.g. /, /about, /blog/first-post)
+  const path = request.nextUrl.pathname;
+
+  // If it's the root path, just return the response
+  if (path === '/') {
+    return NextResponse.next();
+  }
+
+  // Allow OPTIONS request for CORS
+  if (request.method === 'OPTIONS') {
+    return new NextResponse(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+    });
+  }
+
+  // Get response
+  const response = NextResponse.next();
+
+  // Add CORS headers
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  return response;
+}
+
+export const config = {
+  matcher: '/api/:path*',
+};
+
+
+```
 
 ### File: tailwind.config.js
 ```js
@@ -30,10 +74,22 @@ module.exports = {
 ```js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-}
+  async headers() {
+    return [
+      {
+        source: "/api/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Credentials", value: "true" },
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: "Access-Control-Allow-Methods", value: "GET,DELETE,PATCH,POST,PUT" },
+          { key: "Access-Control-Allow-Headers", value: "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization" },
+        ]
+      }
+    ]
+  }
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
 
 
 ```
@@ -42,6 +98,7 @@ module.exports = nextConfig
 ```ts
 /// <reference types="next" />
 /// <reference types="next/image-types/global" />
+/// <reference types="next/navigation-types/compat/navigation" />
 
 // NOTE: This file should not be edited
 // see https://nextjs.org/docs/app/building-your-application/configuring/typescript for more information.
@@ -80,6 +137,8 @@ export default {
   "requires": true,
   "packages": {
     "": {
+      "name": "policy-bot",
+      "version": "0.1.0",
       "dependencies": {
         "axios": "^1.7.7",
         "framer-motion": "^11.11.17",
@@ -176,30 +235,6 @@ export default {
         "url": "https://opencollective.com/eslint"
       }
     },
-    "node_modules/@eslint/eslintrc/node_modules/brace-expansion": {
-      "version": "1.1.11",
-      "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz",
-      "integrity": "sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "balanced-match": "^1.0.0",
-        "concat-map": "0.0.1"
-      }
-    },
-    "node_modules/@eslint/eslintrc/node_modules/minimatch": {
-      "version": "3.1.2",
-      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz",
-      "integrity": "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==",
-      "dev": true,
-      "license": "ISC",
-      "dependencies": {
-        "brace-expansion": "^1.1.7"
-      },
-      "engines": {
-        "node": "*"
-      }
-    },
     "node_modules/@eslint/js": {
       "version": "8.57.1",
       "resolved": "https://registry.npmjs.org/@eslint/js/-/js-8.57.1.tgz",
@@ -224,30 +259,6 @@ export default {
       },
       "engines": {
         "node": ">=10.10.0"
-      }
-    },
-    "node_modules/@humanwhocodes/config-array/node_modules/brace-expansion": {
-      "version": "1.1.11",
-      "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz",
-      "integrity": "sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "balanced-match": "^1.0.0",
-        "concat-map": "0.0.1"
-      }
-    },
-    "node_modules/@humanwhocodes/config-array/node_modules/minimatch": {
-      "version": "3.1.2",
-      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz",
-      "integrity": "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==",
-      "dev": true,
-      "license": "ISC",
-      "dependencies": {
-        "brace-expansion": "^1.1.7"
-      },
-      "engines": {
-        "node": "*"
       }
     },
     "node_modules/@humanwhocodes/module-importer": {
@@ -651,6 +662,35 @@ export default {
         "node": ">=12"
       }
     },
+    "node_modules/@isaacs/cliui/node_modules/ansi-regex": {
+      "version": "6.1.0",
+      "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-6.1.0.tgz",
+      "integrity": "sha512-7HSX4QQb4CspciLpVFwyRe79O3xsIZDDLER21kERQ71oaPodF8jL725AgJMFAYbooIqolJoRLuM81SpeUkpkvA==",
+      "dev": true,
+      "license": "MIT",
+      "engines": {
+        "node": ">=12"
+      },
+      "funding": {
+        "url": "https://github.com/chalk/ansi-regex?sponsor=1"
+      }
+    },
+    "node_modules/@isaacs/cliui/node_modules/strip-ansi": {
+      "version": "7.1.0",
+      "resolved": "https://registry.npmjs.org/strip-ansi/-/strip-ansi-7.1.0.tgz",
+      "integrity": "sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "ansi-regex": "^6.0.1"
+      },
+      "engines": {
+        "node": ">=12"
+      },
+      "funding": {
+        "url": "https://github.com/chalk/strip-ansi?sponsor=1"
+      }
+    },
     "node_modules/@jridgewell/gen-mapping": {
       "version": "0.3.5",
       "resolved": "https://registry.npmjs.org/@jridgewell/gen-mapping/-/gen-mapping-0.3.5.tgz",
@@ -718,36 +758,6 @@ export default {
       "license": "MIT",
       "dependencies": {
         "fast-glob": "3.3.1"
-      }
-    },
-    "node_modules/@next/eslint-plugin-next/node_modules/fast-glob": {
-      "version": "3.3.1",
-      "resolved": "https://registry.npmjs.org/fast-glob/-/fast-glob-3.3.1.tgz",
-      "integrity": "sha512-kNFPyjhh5cKjrUltxs+wFx+ZkbRaxxmZ+X0ZU31SOsxCEtP9VPgtq2teZw1DebupL5GmDaNQ6yKMMVcM41iqDg==",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "@nodelib/fs.stat": "^2.0.2",
-        "@nodelib/fs.walk": "^1.2.3",
-        "glob-parent": "^5.1.2",
-        "merge2": "^1.3.0",
-        "micromatch": "^4.0.4"
-      },
-      "engines": {
-        "node": ">=8.6.0"
-      }
-    },
-    "node_modules/@next/eslint-plugin-next/node_modules/glob-parent": {
-      "version": "5.1.2",
-      "resolved": "https://registry.npmjs.org/glob-parent/-/glob-parent-5.1.2.tgz",
-      "integrity": "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==",
-      "dev": true,
-      "license": "ISC",
-      "dependencies": {
-        "is-glob": "^4.0.1"
-      },
-      "engines": {
-        "node": ">= 6"
       }
     },
     "node_modules/@next/swc-darwin-arm64": {
@@ -1160,6 +1170,62 @@ export default {
         }
       }
     },
+    "node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion": {
+      "version": "2.0.1",
+      "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.1.tgz",
+      "integrity": "sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "balanced-match": "^1.0.0"
+      }
+    },
+    "node_modules/@typescript-eslint/typescript-estree/node_modules/fast-glob": {
+      "version": "3.3.2",
+      "resolved": "https://registry.npmjs.org/fast-glob/-/fast-glob-3.3.2.tgz",
+      "integrity": "sha512-oX2ruAFQwf/Orj8m737Y5adxDQO0LAB7/S5MnxCdTNDd4p6BsyIVsv9JQsATbTSq8KHRpLwIHbVlUNatxd+1Ow==",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "@nodelib/fs.stat": "^2.0.2",
+        "@nodelib/fs.walk": "^1.2.3",
+        "glob-parent": "^5.1.2",
+        "merge2": "^1.3.0",
+        "micromatch": "^4.0.4"
+      },
+      "engines": {
+        "node": ">=8.6.0"
+      }
+    },
+    "node_modules/@typescript-eslint/typescript-estree/node_modules/glob-parent": {
+      "version": "5.1.2",
+      "resolved": "https://registry.npmjs.org/glob-parent/-/glob-parent-5.1.2.tgz",
+      "integrity": "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==",
+      "dev": true,
+      "license": "ISC",
+      "dependencies": {
+        "is-glob": "^4.0.1"
+      },
+      "engines": {
+        "node": ">= 6"
+      }
+    },
+    "node_modules/@typescript-eslint/typescript-estree/node_modules/minimatch": {
+      "version": "9.0.5",
+      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-9.0.5.tgz",
+      "integrity": "sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==",
+      "dev": true,
+      "license": "ISC",
+      "dependencies": {
+        "brace-expansion": "^2.0.1"
+      },
+      "engines": {
+        "node": ">=16 || 14 >=14.17"
+      },
+      "funding": {
+        "url": "https://github.com/sponsors/isaacs"
+      }
+    },
     "node_modules/@typescript-eslint/utils": {
       "version": "8.14.0",
       "resolved": "https://registry.npmjs.org/@typescript-eslint/utils/-/utils-8.14.0.tgz",
@@ -1249,26 +1315,26 @@ export default {
       }
     },
     "node_modules/ansi-regex": {
-      "version": "6.1.0",
-      "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-6.1.0.tgz",
-      "integrity": "sha512-7HSX4QQb4CspciLpVFwyRe79O3xsIZDDLER21kERQ71oaPodF8jL725AgJMFAYbooIqolJoRLuM81SpeUkpkvA==",
+      "version": "5.0.1",
+      "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-5.0.1.tgz",
+      "integrity": "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==",
       "dev": true,
       "license": "MIT",
       "engines": {
-        "node": ">=12"
-      },
-      "funding": {
-        "url": "https://github.com/chalk/ansi-regex?sponsor=1"
+        "node": ">=8"
       }
     },
     "node_modules/ansi-styles": {
-      "version": "6.2.1",
-      "resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-6.2.1.tgz",
-      "integrity": "sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==",
+      "version": "4.3.0",
+      "resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-4.3.0.tgz",
+      "integrity": "sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==",
       "dev": true,
       "license": "MIT",
+      "dependencies": {
+        "color-convert": "^2.0.1"
+      },
       "engines": {
-        "node": ">=12"
+        "node": ">=8"
       },
       "funding": {
         "url": "https://github.com/chalk/ansi-styles?sponsor=1"
@@ -1596,13 +1662,14 @@ export default {
       }
     },
     "node_modules/brace-expansion": {
-      "version": "2.0.1",
-      "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.1.tgz",
-      "integrity": "sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==",
+      "version": "1.1.11",
+      "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz",
+      "integrity": "sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "balanced-match": "^1.0.0"
+        "balanced-match": "^1.0.0",
+        "concat-map": "0.0.1"
       }
     },
     "node_modules/braces": {
@@ -1737,22 +1804,6 @@ export default {
       },
       "funding": {
         "url": "https://github.com/chalk/chalk?sponsor=1"
-      }
-    },
-    "node_modules/chalk/node_modules/ansi-styles": {
-      "version": "4.3.0",
-      "resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-4.3.0.tgz",
-      "integrity": "sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "color-convert": "^2.0.1"
-      },
-      "engines": {
-        "node": ">=8"
-      },
-      "funding": {
-        "url": "https://github.com/chalk/ansi-styles?sponsor=1"
       }
     },
     "node_modules/chokidar": {
@@ -2084,9 +2135,9 @@ export default {
       "license": "MIT"
     },
     "node_modules/electron-to-chromium": {
-      "version": "1.5.60",
-      "resolved": "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.60.tgz",
-      "integrity": "sha512-HcraRUkTKJ+8yA3b10i9qvhUlPBRDlKjn1XGek1zDGVfAKcvi8TsUnImGqLiEm9j6ZulxXIWWIo9BmbkbCTGgA==",
+      "version": "1.5.61",
+      "resolved": "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.61.tgz",
+      "integrity": "sha512-CcRGSBCBB6L9c3PBJWYYrBo6Bzeoi+GZTKvtuRtooJGWsINk+mOInZWcssU35zDTAwreVcrMimc9aMyPpehRNw==",
       "dev": true,
       "license": "ISC"
     },
@@ -2444,6 +2495,36 @@ export default {
         }
       }
     },
+    "node_modules/eslint-import-resolver-typescript/node_modules/fast-glob": {
+      "version": "3.3.2",
+      "resolved": "https://registry.npmjs.org/fast-glob/-/fast-glob-3.3.2.tgz",
+      "integrity": "sha512-oX2ruAFQwf/Orj8m737Y5adxDQO0LAB7/S5MnxCdTNDd4p6BsyIVsv9JQsATbTSq8KHRpLwIHbVlUNatxd+1Ow==",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "@nodelib/fs.stat": "^2.0.2",
+        "@nodelib/fs.walk": "^1.2.3",
+        "glob-parent": "^5.1.2",
+        "merge2": "^1.3.0",
+        "micromatch": "^4.0.4"
+      },
+      "engines": {
+        "node": ">=8.6.0"
+      }
+    },
+    "node_modules/eslint-import-resolver-typescript/node_modules/glob-parent": {
+      "version": "5.1.2",
+      "resolved": "https://registry.npmjs.org/glob-parent/-/glob-parent-5.1.2.tgz",
+      "integrity": "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==",
+      "dev": true,
+      "license": "ISC",
+      "dependencies": {
+        "is-glob": "^4.0.1"
+      },
+      "engines": {
+        "node": ">= 6"
+      }
+    },
     "node_modules/eslint-module-utils": {
       "version": "2.12.0",
       "resolved": "https://registry.npmjs.org/eslint-module-utils/-/eslint-module-utils-2.12.0.tgz",
@@ -2506,17 +2587,6 @@ export default {
         "eslint": "^2 || ^3 || ^4 || ^5 || ^6 || ^7.2.0 || ^8 || ^9"
       }
     },
-    "node_modules/eslint-plugin-import/node_modules/brace-expansion": {
-      "version": "1.1.11",
-      "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz",
-      "integrity": "sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "balanced-match": "^1.0.0",
-        "concat-map": "0.0.1"
-      }
-    },
     "node_modules/eslint-plugin-import/node_modules/debug": {
       "version": "3.2.7",
       "resolved": "https://registry.npmjs.org/debug/-/debug-3.2.7.tgz",
@@ -2538,19 +2608,6 @@ export default {
       },
       "engines": {
         "node": ">=0.10.0"
-      }
-    },
-    "node_modules/eslint-plugin-import/node_modules/minimatch": {
-      "version": "3.1.2",
-      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz",
-      "integrity": "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==",
-      "dev": true,
-      "license": "ISC",
-      "dependencies": {
-        "brace-expansion": "^1.1.7"
-      },
-      "engines": {
-        "node": "*"
       }
     },
     "node_modules/eslint-plugin-import/node_modules/semver": {
@@ -2591,30 +2648,6 @@ export default {
       },
       "peerDependencies": {
         "eslint": "^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9"
-      }
-    },
-    "node_modules/eslint-plugin-jsx-a11y/node_modules/brace-expansion": {
-      "version": "1.1.11",
-      "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz",
-      "integrity": "sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "balanced-match": "^1.0.0",
-        "concat-map": "0.0.1"
-      }
-    },
-    "node_modules/eslint-plugin-jsx-a11y/node_modules/minimatch": {
-      "version": "3.1.2",
-      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz",
-      "integrity": "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==",
-      "dev": true,
-      "license": "ISC",
-      "dependencies": {
-        "brace-expansion": "^1.1.7"
-      },
-      "engines": {
-        "node": "*"
       }
     },
     "node_modules/eslint-plugin-react": {
@@ -2663,17 +2696,6 @@ export default {
         "eslint": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0"
       }
     },
-    "node_modules/eslint-plugin-react/node_modules/brace-expansion": {
-      "version": "1.1.11",
-      "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz",
-      "integrity": "sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "balanced-match": "^1.0.0",
-        "concat-map": "0.0.1"
-      }
-    },
     "node_modules/eslint-plugin-react/node_modules/doctrine": {
       "version": "2.1.0",
       "resolved": "https://registry.npmjs.org/doctrine/-/doctrine-2.1.0.tgz",
@@ -2685,19 +2707,6 @@ export default {
       },
       "engines": {
         "node": ">=0.10.0"
-      }
-    },
-    "node_modules/eslint-plugin-react/node_modules/minimatch": {
-      "version": "3.1.2",
-      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz",
-      "integrity": "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==",
-      "dev": true,
-      "license": "ISC",
-      "dependencies": {
-        "brace-expansion": "^1.1.7"
-      },
-      "engines": {
-        "node": "*"
       }
     },
     "node_modules/eslint-plugin-react/node_modules/resolve": {
@@ -2756,53 +2765,6 @@ export default {
       },
       "funding": {
         "url": "https://opencollective.com/eslint"
-      }
-    },
-    "node_modules/eslint/node_modules/ansi-regex": {
-      "version": "5.0.1",
-      "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-5.0.1.tgz",
-      "integrity": "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==",
-      "dev": true,
-      "license": "MIT",
-      "engines": {
-        "node": ">=8"
-      }
-    },
-    "node_modules/eslint/node_modules/brace-expansion": {
-      "version": "1.1.11",
-      "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz",
-      "integrity": "sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "balanced-match": "^1.0.0",
-        "concat-map": "0.0.1"
-      }
-    },
-    "node_modules/eslint/node_modules/minimatch": {
-      "version": "3.1.2",
-      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz",
-      "integrity": "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==",
-      "dev": true,
-      "license": "ISC",
-      "dependencies": {
-        "brace-expansion": "^1.1.7"
-      },
-      "engines": {
-        "node": "*"
-      }
-    },
-    "node_modules/eslint/node_modules/strip-ansi": {
-      "version": "6.0.1",
-      "resolved": "https://registry.npmjs.org/strip-ansi/-/strip-ansi-6.0.1.tgz",
-      "integrity": "sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "ansi-regex": "^5.0.1"
-      },
-      "engines": {
-        "node": ">=8"
       }
     },
     "node_modules/espree": {
@@ -2877,9 +2839,9 @@ export default {
       "license": "MIT"
     },
     "node_modules/fast-glob": {
-      "version": "3.3.2",
-      "resolved": "https://registry.npmjs.org/fast-glob/-/fast-glob-3.3.2.tgz",
-      "integrity": "sha512-oX2ruAFQwf/Orj8m737Y5adxDQO0LAB7/S5MnxCdTNDd4p6BsyIVsv9JQsATbTSq8KHRpLwIHbVlUNatxd+1Ow==",
+      "version": "3.3.1",
+      "resolved": "https://registry.npmjs.org/fast-glob/-/fast-glob-3.3.1.tgz",
+      "integrity": "sha512-kNFPyjhh5cKjrUltxs+wFx+ZkbRaxxmZ+X0ZU31SOsxCEtP9VPgtq2teZw1DebupL5GmDaNQ6yKMMVcM41iqDg==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
@@ -3208,21 +3170,22 @@ export default {
       }
     },
     "node_modules/glob": {
-      "version": "10.4.5",
-      "resolved": "https://registry.npmjs.org/glob/-/glob-10.4.5.tgz",
-      "integrity": "sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==",
+      "version": "7.2.3",
+      "resolved": "https://registry.npmjs.org/glob/-/glob-7.2.3.tgz",
+      "integrity": "sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==",
+      "deprecated": "Glob versions prior to v9 are no longer supported",
       "dev": true,
       "license": "ISC",
       "dependencies": {
-        "foreground-child": "^3.1.0",
-        "jackspeak": "^3.1.2",
-        "minimatch": "^9.0.4",
-        "minipass": "^7.1.2",
-        "package-json-from-dist": "^1.0.0",
-        "path-scurry": "^1.11.1"
+        "fs.realpath": "^1.0.0",
+        "inflight": "^1.0.4",
+        "inherits": "2",
+        "minimatch": "^3.1.1",
+        "once": "^1.3.0",
+        "path-is-absolute": "^1.0.0"
       },
-      "bin": {
-        "glob": "dist/esm/bin.mjs"
+      "engines": {
+        "node": "*"
       },
       "funding": {
         "url": "https://github.com/sponsors/isaacs"
@@ -4150,19 +4113,16 @@ export default {
       }
     },
     "node_modules/minimatch": {
-      "version": "9.0.5",
-      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-9.0.5.tgz",
-      "integrity": "sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==",
+      "version": "3.1.2",
+      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz",
+      "integrity": "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==",
       "dev": true,
       "license": "ISC",
       "dependencies": {
-        "brace-expansion": "^2.0.1"
+        "brace-expansion": "^1.1.7"
       },
       "engines": {
-        "node": ">=16 || 14 >=14.17"
-      },
-      "funding": {
-        "url": "https://github.com/sponsors/isaacs"
+        "node": "*"
       }
     },
     "node_modules/minimist": {
@@ -5040,52 +5000,6 @@ export default {
         "url": "https://github.com/sponsors/isaacs"
       }
     },
-    "node_modules/rimraf/node_modules/brace-expansion": {
-      "version": "1.1.11",
-      "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz",
-      "integrity": "sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "balanced-match": "^1.0.0",
-        "concat-map": "0.0.1"
-      }
-    },
-    "node_modules/rimraf/node_modules/glob": {
-      "version": "7.2.3",
-      "resolved": "https://registry.npmjs.org/glob/-/glob-7.2.3.tgz",
-      "integrity": "sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==",
-      "deprecated": "Glob versions prior to v9 are no longer supported",
-      "dev": true,
-      "license": "ISC",
-      "dependencies": {
-        "fs.realpath": "^1.0.0",
-        "inflight": "^1.0.4",
-        "inherits": "2",
-        "minimatch": "^3.1.1",
-        "once": "^1.3.0",
-        "path-is-absolute": "^1.0.0"
-      },
-      "engines": {
-        "node": "*"
-      },
-      "funding": {
-        "url": "https://github.com/sponsors/isaacs"
-      }
-    },
-    "node_modules/rimraf/node_modules/minimatch": {
-      "version": "3.1.2",
-      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz",
-      "integrity": "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==",
-      "dev": true,
-      "license": "ISC",
-      "dependencies": {
-        "brace-expansion": "^1.1.7"
-      },
-      "engines": {
-        "node": "*"
-      }
-    },
     "node_modules/run-parallel": {
       "version": "1.2.0",
       "resolved": "https://registry.npmjs.org/run-parallel/-/run-parallel-1.2.0.tgz",
@@ -5359,16 +5273,6 @@ export default {
         "node": ">=8"
       }
     },
-    "node_modules/string-width-cjs/node_modules/ansi-regex": {
-      "version": "5.0.1",
-      "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-5.0.1.tgz",
-      "integrity": "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==",
-      "dev": true,
-      "license": "MIT",
-      "engines": {
-        "node": ">=8"
-      }
-    },
     "node_modules/string-width-cjs/node_modules/emoji-regex": {
       "version": "8.0.0",
       "resolved": "https://registry.npmjs.org/emoji-regex/-/emoji-regex-8.0.0.tgz",
@@ -5376,17 +5280,33 @@ export default {
       "dev": true,
       "license": "MIT"
     },
-    "node_modules/string-width-cjs/node_modules/strip-ansi": {
-      "version": "6.0.1",
-      "resolved": "https://registry.npmjs.org/strip-ansi/-/strip-ansi-6.0.1.tgz",
-      "integrity": "sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==",
+    "node_modules/string-width/node_modules/ansi-regex": {
+      "version": "6.1.0",
+      "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-6.1.0.tgz",
+      "integrity": "sha512-7HSX4QQb4CspciLpVFwyRe79O3xsIZDDLER21kERQ71oaPodF8jL725AgJMFAYbooIqolJoRLuM81SpeUkpkvA==",
+      "dev": true,
+      "license": "MIT",
+      "engines": {
+        "node": ">=12"
+      },
+      "funding": {
+        "url": "https://github.com/chalk/ansi-regex?sponsor=1"
+      }
+    },
+    "node_modules/string-width/node_modules/strip-ansi": {
+      "version": "7.1.0",
+      "resolved": "https://registry.npmjs.org/strip-ansi/-/strip-ansi-7.1.0.tgz",
+      "integrity": "sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "ansi-regex": "^5.0.1"
+        "ansi-regex": "^6.0.1"
       },
       "engines": {
-        "node": ">=8"
+        "node": ">=12"
+      },
+      "funding": {
+        "url": "https://github.com/chalk/strip-ansi?sponsor=1"
       }
     },
     "node_modules/string.prototype.includes": {
@@ -5495,23 +5415,6 @@ export default {
       }
     },
     "node_modules/strip-ansi": {
-      "version": "7.1.0",
-      "resolved": "https://registry.npmjs.org/strip-ansi/-/strip-ansi-7.1.0.tgz",
-      "integrity": "sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "ansi-regex": "^6.0.1"
-      },
-      "engines": {
-        "node": ">=12"
-      },
-      "funding": {
-        "url": "https://github.com/chalk/strip-ansi?sponsor=1"
-      }
-    },
-    "node_modules/strip-ansi-cjs": {
-      "name": "strip-ansi",
       "version": "6.0.1",
       "resolved": "https://registry.npmjs.org/strip-ansi/-/strip-ansi-6.0.1.tgz",
       "integrity": "sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==",
@@ -5524,12 +5427,16 @@ export default {
         "node": ">=8"
       }
     },
-    "node_modules/strip-ansi-cjs/node_modules/ansi-regex": {
-      "version": "5.0.1",
-      "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-5.0.1.tgz",
-      "integrity": "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==",
+    "node_modules/strip-ansi-cjs": {
+      "name": "strip-ansi",
+      "version": "6.0.1",
+      "resolved": "https://registry.npmjs.org/strip-ansi/-/strip-ansi-6.0.1.tgz",
+      "integrity": "sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==",
       "dev": true,
       "license": "MIT",
+      "dependencies": {
+        "ansi-regex": "^5.0.1"
+      },
       "engines": {
         "node": ">=8"
       }
@@ -5603,6 +5510,53 @@ export default {
         "node": ">=16 || 14 >=14.17"
       }
     },
+    "node_modules/sucrase/node_modules/brace-expansion": {
+      "version": "2.0.1",
+      "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.1.tgz",
+      "integrity": "sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "balanced-match": "^1.0.0"
+      }
+    },
+    "node_modules/sucrase/node_modules/glob": {
+      "version": "10.4.5",
+      "resolved": "https://registry.npmjs.org/glob/-/glob-10.4.5.tgz",
+      "integrity": "sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==",
+      "dev": true,
+      "license": "ISC",
+      "dependencies": {
+        "foreground-child": "^3.1.0",
+        "jackspeak": "^3.1.2",
+        "minimatch": "^9.0.4",
+        "minipass": "^7.1.2",
+        "package-json-from-dist": "^1.0.0",
+        "path-scurry": "^1.11.1"
+      },
+      "bin": {
+        "glob": "dist/esm/bin.mjs"
+      },
+      "funding": {
+        "url": "https://github.com/sponsors/isaacs"
+      }
+    },
+    "node_modules/sucrase/node_modules/minimatch": {
+      "version": "9.0.5",
+      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-9.0.5.tgz",
+      "integrity": "sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==",
+      "dev": true,
+      "license": "ISC",
+      "dependencies": {
+        "brace-expansion": "^2.0.1"
+      },
+      "engines": {
+        "node": ">=16 || 14 >=14.17"
+      },
+      "funding": {
+        "url": "https://github.com/sponsors/isaacs"
+      }
+    },
     "node_modules/supports-color": {
       "version": "7.2.0",
       "resolved": "https://registry.npmjs.org/supports-color/-/supports-color-7.2.0.tgz",
@@ -5665,6 +5619,36 @@ export default {
       },
       "engines": {
         "node": ">=14.0.0"
+      }
+    },
+    "node_modules/tailwindcss/node_modules/fast-glob": {
+      "version": "3.3.2",
+      "resolved": "https://registry.npmjs.org/fast-glob/-/fast-glob-3.3.2.tgz",
+      "integrity": "sha512-oX2ruAFQwf/Orj8m737Y5adxDQO0LAB7/S5MnxCdTNDd4p6BsyIVsv9JQsATbTSq8KHRpLwIHbVlUNatxd+1Ow==",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "@nodelib/fs.stat": "^2.0.2",
+        "@nodelib/fs.walk": "^1.2.3",
+        "glob-parent": "^5.1.2",
+        "merge2": "^1.3.0",
+        "micromatch": "^4.0.4"
+      },
+      "engines": {
+        "node": ">=8.6.0"
+      }
+    },
+    "node_modules/tailwindcss/node_modules/fast-glob/node_modules/glob-parent": {
+      "version": "5.1.2",
+      "resolved": "https://registry.npmjs.org/glob-parent/-/glob-parent-5.1.2.tgz",
+      "integrity": "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==",
+      "dev": true,
+      "license": "ISC",
+      "dependencies": {
+        "is-glob": "^4.0.1"
+      },
+      "engines": {
+        "node": ">= 6"
       }
     },
     "node_modules/tapable": {
@@ -6093,32 +6077,6 @@ export default {
         "url": "https://github.com/chalk/wrap-ansi?sponsor=1"
       }
     },
-    "node_modules/wrap-ansi-cjs/node_modules/ansi-regex": {
-      "version": "5.0.1",
-      "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-5.0.1.tgz",
-      "integrity": "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==",
-      "dev": true,
-      "license": "MIT",
-      "engines": {
-        "node": ">=8"
-      }
-    },
-    "node_modules/wrap-ansi-cjs/node_modules/ansi-styles": {
-      "version": "4.3.0",
-      "resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-4.3.0.tgz",
-      "integrity": "sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "color-convert": "^2.0.1"
-      },
-      "engines": {
-        "node": ">=8"
-      },
-      "funding": {
-        "url": "https://github.com/chalk/ansi-styles?sponsor=1"
-      }
-    },
     "node_modules/wrap-ansi-cjs/node_modules/emoji-regex": {
       "version": "8.0.0",
       "resolved": "https://registry.npmjs.org/emoji-regex/-/emoji-regex-8.0.0.tgz",
@@ -6141,17 +6099,46 @@ export default {
         "node": ">=8"
       }
     },
-    "node_modules/wrap-ansi-cjs/node_modules/strip-ansi": {
-      "version": "6.0.1",
-      "resolved": "https://registry.npmjs.org/strip-ansi/-/strip-ansi-6.0.1.tgz",
-      "integrity": "sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==",
+    "node_modules/wrap-ansi/node_modules/ansi-regex": {
+      "version": "6.1.0",
+      "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-6.1.0.tgz",
+      "integrity": "sha512-7HSX4QQb4CspciLpVFwyRe79O3xsIZDDLER21kERQ71oaPodF8jL725AgJMFAYbooIqolJoRLuM81SpeUkpkvA==",
+      "dev": true,
+      "license": "MIT",
+      "engines": {
+        "node": ">=12"
+      },
+      "funding": {
+        "url": "https://github.com/chalk/ansi-regex?sponsor=1"
+      }
+    },
+    "node_modules/wrap-ansi/node_modules/ansi-styles": {
+      "version": "6.2.1",
+      "resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-6.2.1.tgz",
+      "integrity": "sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==",
+      "dev": true,
+      "license": "MIT",
+      "engines": {
+        "node": ">=12"
+      },
+      "funding": {
+        "url": "https://github.com/chalk/ansi-styles?sponsor=1"
+      }
+    },
+    "node_modules/wrap-ansi/node_modules/strip-ansi": {
+      "version": "7.1.0",
+      "resolved": "https://registry.npmjs.org/strip-ansi/-/strip-ansi-7.1.0.tgz",
+      "integrity": "sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "ansi-regex": "^5.0.1"
+        "ansi-regex": "^6.0.1"
       },
       "engines": {
-        "node": ">=8"
+        "node": ">=12"
+      },
+      "funding": {
+        "url": "https://github.com/chalk/strip-ansi?sponsor=1"
       }
     },
     "node_modules/wrappy": {
@@ -6195,6 +6182,9 @@ export default {
 ### File: package.json
 ```json
 {
+  "name": "policy-bot",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
     "axios": "^1.7.7",
     "framer-motion": "^11.11.17",
@@ -6222,6 +6212,7 @@ export default {
     "typescript": "^5.6.3"
   }
 }
+
 
 ```
 
@@ -6256,25 +6247,6 @@ export default {
   "exclude": ["node_modules"]
 }
 
-
-```
-
-### File: openaiClient.ts
-```ts
-// utils/openaiClient.ts
-
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY,
-  defaultHeaders: {
-    "HTTP-Referer": process.env.YOUR_SITE_URL || "",
-    "X-Title": process.env.YOUR_APP_NAME || "",
-  },
-});
-
-export default openai;
 
 ```
 
@@ -6315,7 +6287,7 @@ export default nextConfig;
 
 ### File: .vercel/project.json
 ```json
-{"orgId":"team_rL4qGjWLWFIDnGEccFPKRqpU","projectId":"prj_DxeZYhaS8YlUfoQQ2dEHh9rPuLf6"}
+{"projectId":"prj_DxeZYhaS8YlUfoQQ2dEHh9rPuLf6","orgId":"team_rL4qGjWLWFIDnGEccFPKRqpU"}
 ```
 
 ### File: app/index.tsx
@@ -6481,6 +6453,157 @@ export default function Home() {
 
 ```
 
+### File: app/page.module.css
+```css
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+.imageUpload {
+  margin: 1rem 0;
+}
+
+.imageButton {
+  background-color: #4a5568;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 1rem;
+}
+
+.imagePreview {
+  margin-top: 1rem;
+  position: relative;
+  display: inline-block;
+}
+
+.imagePreview img {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 4px;
+}
+
+.removeImage {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.description {
+  text-align: center;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.input {
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 100px;
+  background-color: white;
+}
+
+.button {
+  padding: 1rem;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.button:hover:not(:disabled) {
+  background-color: #0051a2;
+}
+
+.error {
+  padding: 1rem;
+  background-color: #fff3f3;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  color: #d32f2f;
+  margin-bottom: 1rem;
+}
+
+.response {
+  padding: 1.5rem;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.response h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.characterCount {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+@media (max-width: 600px) {
+  .main {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+}
+
+
+```
+
 ### File: app/layout.tsx
 ```tsx
 import '../styles/globals.css'
@@ -6508,51 +6631,36 @@ export default function RootLayout({
 
 ### File: app/page.tsx
 ```tsx
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react';
-import styles from '../styles/Home.module.css';
-import Layout from '../components/Layout';
-
-const CFTDTI_URL = "https://www.canada.ca/en/department-national-defence/services/benefits-military/pay-pension-benefits/benefits/canadian-forces-temporary-duty-travel-instructions.html";
-
-type UrlStats = {
-  characterCount: number;
-  wordCount: number;
-};
+import { useState, useRef } from 'react';
+import styles from './page.module.css';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Home() {
   const [userInput, setUserInput] = useState('');
   const [response, setResponse] = useState('');
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const [characterCount, setCharacterCount] = useState(0);
-  const [urlStats, setUrlStats] = useState<UrlStats | null>(null);
-  const [isSourceLoading, setIsSourceLoading] = useState(true);
+  const [imageUrl, setImageUrl] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const fetchUrlStats = async () => {
-      setIsSourceLoading(true);
-      try {
-        const res = await fetch('/api/fetch-url');
-        const data = await res.json();
-        setUrlStats(data);
-      } catch (err) {
-        console.error('Failed to fetch URL stats:', err);
-      } finally {
-        setIsSourceLoading(false);
-      }
-    };
-
-    fetchUrlStats();
-  }, []);
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Here you would typically upload the image to a storage service
+      // For this example, we'll use a placeholder URL
+      // You should implement proper image upload functionality
+      setImageUrl(URL.createObjectURL(file));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
     setResponse('');
-    setCharacterCount(0);
 
     try {
       const res = await fetch('/api/chat', {
@@ -6560,310 +6668,115 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
+        body: JSON.stringify({ 
           userInput,
+          imageUrl
         }),
       });
-      
-      const data = await res.json();
 
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const data = await res.json();
       if (data.error) {
         throw new Error(data.error);
       }
 
       setResponse(data.message);
-      setCharacterCount(data.characterCount || 0);
-    } catch (err: Error | unknown) {
-      console.error('Error:', err);
-      setError(err.message || 'Something went wrong');
+      setCharacterCount(data.characterCount);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to get response');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Layout>
+    <main className={styles.main}>
       <div className={styles.container}>
-        <main className={styles.main}>
-          <h1 className={styles.title}>CFTDTI Assistant</h1>
+        <h1 className={styles.title}>CFTDTI Assistant</h1>
+        <p className={styles.description}>
+          Ask questions about the Canadian Forces Temporary Duty Travel Instructions
+        </p>
+
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <textarea
+            value={userInput}
+            onChange={(e) => setUserInput(e.target.value)}
+            placeholder="Ask your question here..."
+            className={styles.input}
+            rows={4}
+          />
           
-          <div className={styles.urlDisplay}>
-            <strong>Reference Document:</strong>
-            <a href={CFTDTI_URL} target="_blank" rel="noopener noreferrer">
-              CFTDTI
-            </a>
-            {isSourceLoading ? (
-              <div className={styles.loading}>Loading source content...</div>
-            ) : urlStats && (
-              <div className={styles.urlStats}>
-                <p>Source Document Statistics:</p>
-                <ul>
-                  <li>Characters: {urlStats.characterCount.toLocaleString()}</li>
-                  <li>Words: {urlStats.wordCount.toLocaleString()}</li>
-                </ul>
+          <div className={styles.imageUpload}>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className={styles.imageButton}
+            >
+              Upload Image
+            </button>
+            {imageUrl && (
+              <div className={styles.imagePreview}>
+                <img src={imageUrl} alt="Uploaded preview" />
+                <button
+                  type="button"
+                  onClick={() => setImageUrl('')}
+                  className={styles.removeImage}
+                >
+                  Remove
+                </button>
               </div>
             )}
           </div>
 
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <div>
-              <label htmlFor="userInput">Your Question:</label>
-              <textarea
-                id="userInput"
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                required
-                className={styles.textarea}
-                placeholder="Ask a question about CFTDTI..."
-                disabled={isLoading || isSourceLoading}
-              />
-              <div className={styles.characterCount}>
-                Characters: {userInput.length}
-              </div>
-            </div>
+          <button 
+            type="submit" 
+            className={styles.button}
+            disabled={isLoading || (!userInput.trim() && !imageUrl)}
+          >
+            {isLoading ? 'Processing...' : 'Send Question'}
+          </button>
+        </form>
 
-            <button 
-              type="submit" 
-              disabled={isLoading || isSourceLoading}
-              className={styles.button}
-            >
-              {isLoading ? 'Processing...' : isSourceLoading ? 'Loading Source...' : 'Send Question'}
-            </button>
-          </form>
-
+        <AnimatePresence>
           {error && (
-            <div className={styles.error}>
-              <p>Error: {error}</p>
-            </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className={styles.error}
+            >
+              {error}
+            </motion.div>
           )}
 
           {response && (
-            <div className={styles.response}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className={styles.response}
+            >
               <h2>Response:</h2>
               <p>{response}</p>
-              {characterCount > 0 && (
-                <div className={styles.stats}>
-                  <p>Source characters processed: {characterCount.toLocaleString()}</p>
-                  {urlStats && (
-                    <p>Source coverage: {((characterCount / urlStats.characterCount) * 100).toFixed(1)}%</p>
-                  )}
-                </div>
-              )}
-            </div>
+              <p className={styles.characterCount}>
+                Source content characters: {characterCount}
+              </p>
+            </motion.div>
           )}
-
-          {isLoading && (
-            <div className={styles.loadingOverlay}>
-              <div className={styles.loadingSpinner}>
-                Processing your question...
-              </div>
-            </div>
-          )}
-        </main>
+        </AnimatePresence>
       </div>
-    </Layout>
+    </main>
   );
-}
-
-
-```
-
-### File: app/api/chat/route.ts
-```ts
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import openrouterClient from '../../../utils/openrouterClient';
-import axios, { AxiosError } from 'axios'; // Add this import
-
-const CFTDTI_URL = "https://www.canada.ca/en/department-national-defence/services/benefits-military/pay-pension-benefits/benefits/canadian-forces-temporary-duty-travel-instructions.html";
-
-interface OpenRouterResponse {
-  choices: {
-    message: {
-      content: string;
-    };
-  }[];
-}
-
-async function fetchCFTDTIContent() {
-  try {
-    const response = await fetch(CFTDTI_URL);
-    const text = await response.text();
-    const cleanText = text.replace(/<[^>]*>/g, ' ')
-                         .replace(/\s+/g, ' ')
-                         .trim();
-    return cleanText;
-  } catch (error) {
-    console.error('Error fetching CFTDTI content:', error);
-    throw error;
-  }
-}
-
-export async function POST(request: NextRequest) {
-  if (!process.env.OPENROUTER_API_KEY) {
-    return NextResponse.json(
-      { error: 'OpenRouter API key is not configured' },
-      { status: 500 }
-    );
-  }
-
-  try {
-    const body = await request.json();
-    const { userInput } = body;
-
-    if (!userInput) {
-      return NextResponse.json(
-        { error: 'Missing user input' },
-        { status: 400 }
-      );
-    }
-
-    const sourceContent = await fetchCFTDTIContent();
-
-    const systemPrompt = `You are a helpful assistant specializing in Canadian Forces Temporary Duty Travel Instructions (CFTDTI). 
-    Use the following source content to answer questions accurately. Only provide information that is directly supported by the source content.
-    If information isn't found in the source, clearly state that. Always reference specific sections when possible.
-
-    Source Content:
-    ${sourceContent}`;
-
-    const response = await openrouterClient.post<OpenRouterResponse>('/chat/completions', {
-      model: "google/gemini-flash-1.5-8b",
-      messages: [
-        { 
-          role: "system", 
-          content: systemPrompt
-        },
-        { 
-          role: "user", 
-          content: userInput
-        }
-      ],
-      temperature: 0.3,
-      max_tokens: 1024
-    });
-
-    const completion = response.data;
-
-    if (!completion.choices?.[0]?.message?.content) {
-      return NextResponse.json(
-        { error: 'No response content received' },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      message: completion.choices[0].message.content,
-      characterCount: sourceContent.length
-    });
-
-  } catch (error) {
-    console.error('Error in API route:', error);
-    
-    if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError<{ error: string }>;
-      const statusCode = axiosError.response?.status || 500;
-      const errorData = axiosError.response?.data;
-      
-      console.error('OpenRouter API Error Details:', {
-        status: statusCode,
-        data: errorData
-      });
-
-      return NextResponse.json(
-        { error: errorData?.error || 'OpenRouter API error' },
-        { status: statusCode }
-      );
-    }
-    
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
-
-
-```
-
-### File: app/api/fetch-url/route.ts
-```ts
-import { NextResponse } from 'next/server';
-import axios from 'axios';
-
-// Define interfaces that we'll actually use
-interface ApiResponse {
-  content?: string;
-  error?: string;
-  timestamp?: string;
-}
-
-export async function GET(): Promise<NextResponse<ApiResponse>> {
-  try {
-    const response = await axios.get('https://cfpguide.cfainstitute.org/', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; PolicyBot/1.0;)',
-        'Accept': 'text/html,application/xhtml+xml',
-      },
-      timeout: 5000, // 5 seconds timeout
-    });
-    
-    if (response.status === 200) {
-      const sanitizedContent = response.data.replace(
-        /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, 
-        ''
-      );
-      
-      return NextResponse.json({
-        content: sanitizedContent,
-        timestamp: new Date().toISOString()
-      });
-    } else {
-      throw new Error(`Failed to fetch URL: ${response.status}`);
-    }
-  } catch (error: unknown) {
-    const err = error as Error;
-    console.error('Error fetching URL:', err);
-    
-    return NextResponse.json(
-      { error: err.message || 'Failed to fetch URL' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function POST(): Promise<NextResponse<ApiResponse>> {
-  try {
-    const response = await axios.get('https://cfpguide.cfainstitute.org/', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; PolicyBot/1.0;)',
-        'Accept': 'text/html,application/xhtml+xml',
-      },
-      timeout: 5000,
-    });
-    
-    if (response.status === 200) {
-      const sanitizedContent = response.data.replace(
-        /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, 
-        ''
-      );
-      
-      return NextResponse.json({
-        content: sanitizedContent,
-        timestamp: new Date().toISOString()
-      });
-    } else {
-      throw new Error(`Failed to fetch URL: ${response.status}`);
-    }
-  } catch (error: unknown) {
-    const err = error as Error;
-    console.error('Error fetching URL:', err);
-    
-    return NextResponse.json(
-      { error: err.message || 'Failed to fetch URL' },
-      { status: 500 }
-    );
-  }
 }
 
 
@@ -7200,50 +7113,163 @@ export default QuestionForm;
 ### File: api/chat.ts
 ```ts
 import type { NextApiRequest, NextApiResponse } from 'next';
-import openrouterClient from '@/utils/openrouterClient';
 
-
-type ChatMessage = {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-};
-
-type Data = {
-  message: string;
-  error?: string;
-};
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ 
-      message: 'Method not allowed', 
-      error: 'Use POST method' 
-    });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { messages } = req.body;
+    const { userInput } = req.body;
 
-    const response = await openrouterClient.post('/chat/completions', {
-      model: 'gpt-3.5-turbo', // or your preferred model
-      messages: messages,
-      temperature: 0.7,
-      max_tokens: 1000,
+    if (!process.env.OPENROUTER_API_KEY) {
+      return res.status(500).json({ error: 'OpenRouter API key not configured' });
+    }
+
+    // Fetch CFTDTI content
+    const sourceResponse = await fetch(
+      "https://www.canada.ca/en/department-national-defence/services/benefits-military/pay-pension-benefits/benefits/canadian-forces-temporary-duty-travel-instructions.html"
+    );
+    const sourceText = await sourceResponse.text();
+    const sourceContent = sourceText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+
+    // Make request to OpenRouter
+    const chatResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        'HTTP-Referer': process.env.VERCEL_URL || 'http://localhost:3000',
+        'X-Title': 'CFTDTI Assistant'
+      },
+      body: JSON.stringify({
+        model: "google/gemini-flash-1.5-8b",
+        messages: [
+          {
+            role: "system",
+            content: `You are a helpful assistant specializing in Canadian Forces Temporary Duty Travel Instructions (CFTDTI). 
+            Use the following source content to answer questions accurately: ${sourceContent}`
+          },
+          {
+            role: "user",
+            content: userInput
+          }
+        ]
+      })
     });
 
-    return res.status(200).json({ 
-      message: response.data.choices[0].message.content 
+    const data = await chatResponse.json();
+
+    return res.status(200).json({
+      message: data.choices[0].message.content,
+      characterCount: sourceContent.length
     });
-    
-  } catch (error: unknown) {
-    const err = error as Error;
-    console.error('OpenRouter API Error:', err);
-    return res.status(500).json({ 
-      message: 'Error processing your request',
-      error: err.message 
+
+  } catch (error) {
+    console.error('API Error:', error);
+    return res.status(500).json({
+      error: error instanceof Error ? error.message : 'Internal server error'
+    });
+  }
+}
+
+
+```
+
+### File: pages/api/chat.ts
+```ts
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+type Message = {
+  role: string;
+  content: string | Array<{
+    type: string;
+    text?: string;
+    image_url?: {
+      url: string;
+    };
+  }>;
+};
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    const { userInput, imageUrl } = req.body;
+
+    if (!process.env.OPENROUTER_API_KEY) {
+      return res.status(500).json({ error: 'OpenRouter API key not configured' });
+    }
+
+    // Fetch CFTDTI content
+    const sourceResponse = await fetch(
+      "https://www.canada.ca/en/department-national-defence/services/benefits-military/pay-pension-benefits/benefits/canadian-forces-temporary-duty-travel-instructions.html"
+    );
+    const sourceText = await sourceResponse.text();
+    const sourceContent = sourceText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+
+    // Prepare messages based on input type
+    const messages: Message[] = [];
+
+    // Add system message
+    messages.push({
+      role: "system",
+      content: `You are a helpful assistant specializing in Canadian Forces Temporary Duty Travel Instructions (CFTDTI). 
+      Use the following source content to answer questions accurately: ${sourceContent}`
+    });
+
+    // Add user message with text and/or image
+    if (imageUrl) {
+      messages.push({
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: userInput || "What's in this image?"
+          },
+          {
+            type: "image_url",
+            image_url: {
+              url: imageUrl
+            }
+          }
+        ]
+      });
+    } else {
+      messages.push({
+        role: "user",
+        content: userInput
+      });
+    }
+
+    // Make request to OpenRouter
+    const chatResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        'HTTP-Referer': process.env.VERCEL_URL || 'http://localhost:3000',
+        'X-Title': process.env.SITE_NAME || 'CFTDTI Assistant',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: "google/gemini-flash-1.5-8b",
+        messages: messages
+      })
+    });
+
+    const data = await chatResponse.json();
+
+    return res.status(200).json({
+      message: data.choices[0].message.content,
+      characterCount: sourceContent.length
+    });
+
+  } catch (error) {
+    console.error('API Error:', error);
+    return res.status(500).json({
+      error: error instanceof Error ? error.message : 'Internal server error'
     });
   }
 }
