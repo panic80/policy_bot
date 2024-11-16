@@ -1,4 +1,5 @@
 'use client';
+import styles from './page.module.css';
 
 import { useState, useEffect } from 'react'; // Remove useRef if not using it
 
